@@ -97,9 +97,7 @@ export default {
     const url = new URL(request.url);
     if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
     if (url.pathname === "/" || url.pathname === "/index.html") {
-      return new Response(generatorPage(), {
-        headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" },
-      });
+      return serveHtml("kit.html");
     }
     if (url.pathname === "/preview") return serveHtml("public.html");
     if (url.pathname === "/newsletter-template" || url.pathname === "/newsletter-template.html") {
