@@ -33,6 +33,27 @@ async function serveImage(path) {
   });
 }
 
+async function servePartnerProgram(request) {
+  const [originResponse, blockResponse] = await Promise.all([
+    fetch(request),
+    fetchRepositoryFile("partner-program-starter-kit-block.html", true),
+  ]);
+
+  if (!originResponse.ok || !blockResponse.ok) return originResponse;
+  const contentType = originResponse.headers.get("content-type") || "";
+  if (!contentType.includes("text/html")) return originResponse;
+
+  const replacementBlock = await blockResponse.text();
+
+  return new HTMLRewriter()
+    .on('div[style*="background: #171b23"][style*="border-radius: 16px"]', {
+      element(element) {
+        element.replace(replacementBlock, { html: true });
+      },
+    })
+    .transform(originResponse);
+}
+
 function generatorPage() {
   return `<!doctype html>
 <html lang="en">
@@ -96,9 +117,17 @@ export default {
   async fetch(request) {
     const url = new URL(request.url);
     if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+
+    if (
+      url.hostname === "www.onefantasticshop.net" &&
+      url.pathname === "/en/content/26-partner-program"
+    ) {
+      return servePartnerProgram(request);
+    }
+
     if (url.pathname === "/" || url.pathname === "/index.html") {
       return serveHtml("kit.html");
-    }
+}
     if (url.pathname === "/preview") return serveHtml("public.html");
     if (url.pathname === "/newsletter-template" || url.pathname === "/newsletter-template.html") {
       return serveHtml("partner.html");
