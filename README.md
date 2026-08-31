@@ -6,9 +6,9 @@ Ce dépôt est la source publique permanente de la dernière édition de The Sec
 - `partner.html` : version Freelancer avec `{{AFFILIATE_URL}}`
 - `kit.html` : kit Freelancer en ligne, guide ChatGPT et générateur personnalisé
 - `current.json` : édition actuellement active
-- `recent-discoveries.html` : bloc des 5 produits les plus intéressants de l'édition active
-- `recent-discoveries-loader.js` : chargeur sécurisé qui remplace uniquement le bloc `RECENT DISCOVERIES IN OUR LATEST ISSUE`
-- `tekdiscover-homepage-worker.js` : Worker dédié à la page d'accueil TekDiscover et aux deux fichiers Recent Discoveries
+- `recent-discoveries.html` : bloc complet Secret Newsletter de la page d'accueil TekDiscover, avec design conversion + 3 produits visibles + 2 découvertes verrouillées
+- `recent-discoveries-loader.js` : chargeur sécurisé qui remplace uniquement le bloc complet Secret Newsletter de la page d'accueil après validation de signatures uniques
+- `tekdiscover-homepage-worker.js` : Worker dédié à la page d'accueil TekDiscover et aux fichiers de remplacement
 - `assets/issue-001/` : images publiques HTTPS
 - `cloudflare-worker.js` : chargeur permanent de la newsletter et du kit Freelancer
 
@@ -17,14 +17,17 @@ Ce dépôt est la source publique permanente de la dernière édition de The Sec
 À chaque nouvelle édition, ChatGPT doit :
 
 1. valider les 10 produits de la newsletter ;
-2. sélectionner automatiquement les 5 produits les plus intéressants selon le wow factor, l'utilité, l'attractivité du prix, la qualité visuelle, la disponibilité et la diversité ;
-3. remplacer `public.html` ;
-4. remplacer `partner.html` ;
-5. actualiser `current.json` ;
-6. remplacer `recent-discoveries.html` avec les 5 produits sélectionnés ;
-7. vérifier que les noms, images, prix et liens du bloc correspondent à l'édition active.
+2. sélectionner automatiquement 3 produits particulièrement attractifs pour être montrés publiquement selon le wow factor, l'utilité, l'attractivité du prix, la qualité visuelle, la disponibilité et la diversité ;
+3. conserver 2 cartes verrouillées `MEMBERS ONLY` afin de créer de la curiosité et de conduire vers l'essai gratuit ;
+4. remplacer `public.html` ;
+5. remplacer `partner.html` ;
+6. actualiser `current.json` ;
+7. actualiser `recent-discoveries.html` avec le design Secret Newsletter approuvé, les 3 produits visibles de l'édition et 2 cartes verrouillées ;
+8. vérifier que les noms, images, prix et liens des 3 produits correspondent à l'édition active et que les CTA verrouillés pointent vers l'abonnement.
 
-Une fois `tekdiscover-homepage-worker.js` déployé et routé une seule fois sur TekDiscover, les changements futurs de `recent-discoveries.html` sont lus depuis la branche `main` sans modification manuelle de PrestaShop.
+Le positionnement permanent de ce bloc est : technologies utiles du quotidien, découvertes précoces, prix attractifs lorsqu'ils sont vérifiés, et accès membre aux découvertes non révélées. Ne jamais inventer un stock limité, une exclusivité ou une urgence.
+
+Une fois `tekdiscover-homepage-worker.js` déployé et routé sur TekDiscover, les changements de `recent-discoveries.html` et `recent-discoveries-loader.js` sont lus depuis la branche `main` sans modification manuelle de PrestaShop ni nouveau déploiement Cloudflare. Le loader est fail-safe : si la structure de la page ne correspond plus aux signatures attendues, il laisse le contenu d'origine intact plutôt que de remplacer une mauvaise zone.
 
 Le Worker newsletter charge aussi `kit.html` depuis `main`, ce qui permet de mettre à jour le kit Freelancer sans nouveau déploiement Cloudflare.
 
